@@ -9,12 +9,12 @@ interface pageProps {}
 const Page: FC<pageProps> = ({}) => {
   const [color, setColor] = useState<string>("#000");
   const { canvasRef, onMouseDown, clear } = useDraw(drawLine);
+  const [width, setWidth] = useState<number>();
 
   function drawLine({ prevPoint, currentPoint, ctx }: Draw) {
     const { x: currX, y: currY } = currentPoint;
     const lineColor = color;
-    // value of document id strokeWidth
-    const lineWidth = document.getElementById("strokeWidth").value;
+    const lineWidth: any = width;
 
     let startPoint = prevPoint ?? currentPoint;
     ctx.beginPath();
@@ -43,6 +43,7 @@ const Page: FC<pageProps> = ({}) => {
             max="100"
             className="range"
             defaultValue={10}
+            onChange={(e) => setWidth(parseInt(e.target.value))}
           />
         </div>
         <button
