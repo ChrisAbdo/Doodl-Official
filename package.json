@@ -6,13 +6,16 @@
     "start": "next start"
   },
   "dependencies": {
+    "daisyui": "^2.40.1",
     "next": "latest",
     "react": "18.2.0",
+    "react-color": "^2.19.3",
     "react-dom": "18.2.0"
   },
   "devDependencies": {
     "@types/node": "18.11.3",
     "@types/react": "18.0.21",
+    "@types/react-color": "^3.0.6",
     "@types/react-dom": "18.0.6",
     "autoprefixer": "^10.4.12",
     "postcss": "^8.4.18",
