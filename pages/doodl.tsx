@@ -350,17 +350,23 @@ const Page: FC<pageProps> = ({}) => {
               >
                 submit!
               </label> */}
-
-              <label
-                htmlFor="my-modal-6"
-                className="relative inline-block px-4 py-2 font-medium group cursor-pointer text-center"
-              >
-                <span className="absolute inset-0 w-full h-full transition duration-200 ease-out transform translate-x-1 translate-y-1 bg-[#77dd77] border-black border-[2px] group-hover:-translate-x-0 group-hover:-translate-y-0"></span>
-                <span className="absolute inset-0 w-full h-full bg-white border-2 border-black group-hover:bg-[#77dd77]"></span>
-                <span className="relative text-black group-hover:text-black">
-                  submit
-                </span>
-              </label>
+              {minutes > 0 ? (
+                <label
+                  htmlFor="my-modal-6"
+                  className="relative inline-block px-4 py-2 font-medium group cursor-pointer text-center"
+                >
+                  <span className="absolute inset-0 w-full h-full transition duration-200 ease-out transform translate-x-1 translate-y-1 bg-[#77dd77] border-black border-[2px] group-hover:-translate-x-0 group-hover:-translate-y-0"></span>
+                  <span className="absolute inset-0 w-full h-full bg-white border-2 border-black group-hover:bg-[#77dd77]"></span>
+                  <span className="relative text-black group-hover:text-black">
+                    submit
+                  </span>
+                </label>
+              ) : (
+                <h1>
+                  <span className="text-red-500">Time's up!</span> You can now
+                  vote for the best doodl.
+                </h1>
+              )}
             </div>
           </div>
           <div>
@@ -439,6 +445,9 @@ const Page: FC<pageProps> = ({}) => {
             <label className="text-center" htmlFor="price">
               BE ALERT: ALL DOODLS WILL BE VERIFIED.
             </label>
+
+            {/* if there is time left show this, otherwise display nothing */}
+
             <div
               onClick={listNFTForSale}
               className="relative inline-block px-4 py-2 font-medium group cursor-pointer text-center"
