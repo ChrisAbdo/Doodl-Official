@@ -14,8 +14,8 @@ contract Marketplace is ReentrancyGuard {
     mapping(uint256 => NFT) private _idToNFT;
 
     string public prompt = "outerspace cowboy";
-    // public time of 1 day
-    uint256 public time = 0.01 days;
+    // public time of 0.001 day
+    uint256 public time = 0.05 days;
     uint256 public currentTime = block.timestamp;
 
     struct NFT {
