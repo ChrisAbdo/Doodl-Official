@@ -15,7 +15,7 @@ contract Marketplace is ReentrancyGuard {
 
     string public prompt = "outerspace cowboy";
     // public time of 1 day
-    uint256 public time = 0.1 days;
+    uint256 public time = 0.01 days;
     uint256 public currentTime = block.timestamp;
 
     struct NFT {
