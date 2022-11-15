@@ -267,7 +267,7 @@ const Page: FC<pageProps> = ({}) => {
   return (
     <>
       <div className="flex items-center text-center justify-center">
-        <div className="card w-96 bg-base-100 border border-black text-center items-center">
+        <div className="card rounded-none w-96 bg-base-100 border border-black text-center items-center">
           <div className="card-body text-center  justify-center items-center">
             <h2 className="card-title font-extrabold">PROMPT:</h2>
             <h2 className="card-title text-2xl">{prompt}</h2>
@@ -312,7 +312,7 @@ const Page: FC<pageProps> = ({}) => {
                 {/* little p tag that says the value of the stroke width */}
                 <p className="text-center">{width}</p>
               </div>
-              <button
+              {/* <button
                 type="button"
                 className="p-2 rounded-md border border-black btn btn-outline"
                 onClick={() => {
@@ -325,13 +325,41 @@ const Page: FC<pageProps> = ({}) => {
                 }}
               >
                 clear
-              </button>
+              </button> */}
+              <div
+                onClick={() => {
+                  clear();
+                  toast.success("Canvas cleared!", {
+                    style: {
+                      border: "2px solid #000",
+                    },
+                  });
+                }}
+                className="relative inline-block px-4 py-2 font-medium group cursor-pointer text-center"
+              >
+                <span className="absolute inset-0 w-full h-full transition duration-200 ease-out transform translate-x-1 translate-y-1 bg-[#FF6F91] border-black border-[2px] group-hover:-translate-x-0 group-hover:-translate-y-0"></span>
+                <span className="absolute inset-0 w-full h-full bg-white border-2 border-black group-hover:bg-[#FF6F91]"></span>
+                <span className="relative text-black group-hover:text-black">
+                  clear
+                </span>
+              </div>
 
-              <label
+              {/* <label
                 htmlFor="my-modal-6"
                 className="p-2 rounded-md border border-black text-center cursor-pointer btn btn-outline"
               >
                 submit!
+              </label> */}
+
+              <label
+                htmlFor="my-modal-6"
+                className="relative inline-block px-4 py-2 font-medium group cursor-pointer text-center"
+              >
+                <span className="absolute inset-0 w-full h-full transition duration-200 ease-out transform translate-x-1 translate-y-1 bg-[#77dd77] border-black border-[2px] group-hover:-translate-x-0 group-hover:-translate-y-0"></span>
+                <span className="absolute inset-0 w-full h-full bg-white border-2 border-black group-hover:bg-[#77dd77]"></span>
+                <span className="relative text-black group-hover:text-black">
+                  submit
+                </span>
               </label>
             </div>
           </div>
@@ -342,7 +370,7 @@ const Page: FC<pageProps> = ({}) => {
               onMouseDown={onMouseDown}
               width={500}
               height={500}
-              className="border border-black rounded-md"
+              className="border border-black rounded-none"
               id="canvas"
             />
           </div>
@@ -384,7 +412,7 @@ const Page: FC<pageProps> = ({}) => {
               }
             />
             <label htmlFor="price">
-              For regulatory purposes, please manually import your doodl <br />
+              For safety purposes, please manually import your doodl <br />
               1. Click the "download" button below, this will automatically
               download your stem as a png file <br />
               2. Choose the file you just downloaded <br />
@@ -393,7 +421,7 @@ const Page: FC<pageProps> = ({}) => {
             </label>
             <div
               onClick={downloadCanvas}
-              className="relative inline-block px-4 py-2 font-medium group cursor-pointer"
+              className="relative inline-block px-4 py-2 font-medium group cursor-pointer text-center"
             >
               <span className="absolute inset-0 w-full h-full transition duration-200 ease-out transform translate-x-1 translate-y-1 bg-[#A7C7E7] border-black border-[2px] group-hover:-translate-x-0 group-hover:-translate-y-0"></span>
               <span className="absolute inset-0 w-full h-full bg-white border-2 border-black group-hover:bg-[#A7C7E7]"></span>
@@ -413,18 +441,25 @@ const Page: FC<pageProps> = ({}) => {
             </label>
             <div
               onClick={listNFTForSale}
-              className="relative inline-block px-4 py-2 font-medium group cursor-pointer"
+              className="relative inline-block px-4 py-2 font-medium group cursor-pointer text-center"
             >
-              <span className="absolute inset-0 w-full h-full transition duration-200 ease-out transform translate-x-1 translate-y-1 bg-[#FF6F91] border-black border-[2px] group-hover:-translate-x-0 group-hover:-translate-y-0"></span>
-              <span className="absolute inset-0 w-full h-full bg-white border-2 border-black group-hover:bg-[#FF6F91]"></span>
+              <span className="absolute inset-0 w-full h-full transition duration-200 ease-out transform translate-x-1 translate-y-1 bg-[#77dd77] border-black border-[2px] group-hover:-translate-x-0 group-hover:-translate-y-0"></span>
+              <span className="absolute inset-0 w-full h-full bg-white border-2 border-black group-hover:bg-[#77dd77]"></span>
               <span className="relative text-black group-hover:text-black">
                 Submit
               </span>
             </div>
           </div>
           <div className="modal-action">
-            <label htmlFor="my-modal-6" className="btn">
-              cancel
+            <label
+              htmlFor="my-modal-6"
+              className="relative inline-block px-4 py-2 font-medium group cursor-pointer text-center"
+            >
+              <span className="absolute inset-0 w-full h-full transition duration-200 ease-out transform translate-x-1 translate-y-1 bg-[#cfcfc4] border-black border-[2px] group-hover:-translate-x-0 group-hover:-translate-y-0"></span>
+              <span className="absolute inset-0 w-full h-full bg-white border-2 border-black group-hover:bg-[#cfcfc4]"></span>
+              <span className="relative text-black group-hover:text-black">
+                close
+              </span>
             </label>
           </div>
         </div>

@@ -160,7 +160,7 @@ const index = ({ Web3Handler, account }) => {
         </div>
         <div className="stats rounded-none ">
           <div className="stat">
-            <div className=" text-black text-center">prize pool</div>
+            <div className=" text-black text-center">prize pool (MATIC)</div>
             <div className="stat-value text-center">{prizePool}</div>
           </div>
         </div>
