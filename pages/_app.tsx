@@ -35,6 +35,22 @@ function MyApp({ Component, pageProps }: AppProps) {
       },
     });
     try {
+      await window.ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [
+          {
+            chainId: "0x13881",
+            chainName: "Matic Mumbai Testnet",
+            nativeCurrency: {
+              name: "MATIC",
+              symbol: "MATIC",
+              decimals: 18,
+            },
+            rpcUrls: ["https://rpc-mumbai.maticvigil.com/"],
+            blockExplorerUrls: ["https://mumbai.polygonscan.com/"],
+          },
+        ],
+      });
       const account = await window.ethereum.request({
         method: "eth_requestAccounts",
       });
@@ -45,6 +61,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       toast.success("Account connected", {
         id: notification,
       });
+      window.location.reload();
     } catch (err) {
       console.log(err);
       toast.error("Account not connected", {
