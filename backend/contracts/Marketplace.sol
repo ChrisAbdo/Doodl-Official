@@ -15,7 +15,7 @@ contract Marketplace is ReentrancyGuard {
 
     string public prompt = "outerspace cowboy";
     // public time of 1 day
-    uint256 public time = 1 days;
+    uint256 public time = 1 minutes;
     uint256 public currentTime = block.timestamp;
 
     struct NFT {
@@ -63,6 +63,8 @@ contract Marketplace is ReentrancyGuard {
     ) public payable nonReentrant {
         require(_price > 0, "Price must be at least 1 wei");
         require(msg.value == LISTING_FEE, "Not enough ether for listing fee");
+        // require that there is time remaining
+        require(getTimeLeft() > 0, "Time has expired");
 
         IERC721(_nftContract).transferFrom(msg.sender, address(this), _tokenId);
 
