@@ -350,7 +350,7 @@ const Page: FC<pageProps> = ({}) => {
               >
                 submit!
               </label> */}
-              {minutes > 0 ? (
+              {minutes && hours > 0 ? (
                 <label
                   htmlFor="my-modal-6"
                   className="relative inline-block px-4 py-2 font-medium group cursor-pointer text-center"
