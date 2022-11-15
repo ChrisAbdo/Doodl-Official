@@ -13,8 +13,7 @@ contract Marketplace is ReentrancyGuard {
     address payable private _marketOwner;
     mapping(uint256 => NFT) private _idToNFT;
 
-    // public string prompt is hello to the world
-    string public prompt = "hello to the world";
+    string public prompt = "outerspace cowboy";
     // public time of 1 day
     uint256 public time = 1 days;
     uint256 public currentTime = block.timestamp;
@@ -43,11 +42,9 @@ contract Marketplace is ReentrancyGuard {
     );
 
     constructor() {
-        // set marketOwner to "0x944aFe2AF5C3d5637F1F3cDB4a130f272DE73420"
-        _marketOwner = payable(0x944aFe2AF5C3d5637F1F3cDB4a130f272DE73420);
+        _marketOwner = payable(msg.sender);
     }
 
-    // function to get the prompt and the time
     function getPrompt() public view returns (string memory) {
         return prompt;
     }
@@ -65,7 +62,6 @@ contract Marketplace is ReentrancyGuard {
         uint256 _price
     ) public payable nonReentrant {
         require(_price > 0, "Price must be at least 1 wei");
-
         require(msg.value == LISTING_FEE, "Not enough ether for listing fee");
 
         IERC721(_nftContract).transferFrom(msg.sender, address(this), _tokenId);
@@ -116,7 +112,7 @@ contract Marketplace is ReentrancyGuard {
         );
     }
 
-    // Buy an NFT that pays the original seller the royalty
+    // Buy an NFT
     function buyNft(address _nftContract, uint256 _tokenId)
         public
         payable
@@ -133,18 +129,10 @@ contract Marketplace is ReentrancyGuard {
         IERC721(_nftContract).transferFrom(address(this), buyer, nft.tokenId);
         _marketOwner.transfer(LISTING_FEE);
         nft.owner = buyer;
-
         nft.listed = false;
 
         _nftsSold.increment();
-        emit NFTSold(
-            _nftContract,
-            _tokenId,
-            // allow the seller to get royalties
-            nft.seller,
-            buyer,
-            nft.price
-        );
+        emit NFTSold(_nftContract, nft.tokenId, nft.seller, buyer, msg.value);
     }
 
     function getListingFee() public view returns (uint256) {

@@ -9,32 +9,51 @@ import Marketplace from "../backend/build/contracts/Marketplace.json";
 import NFT from "../backend/build/contracts/NFT.json";
 
 import Web3 from "web3";
+import { create as ipfsHttpClient } from "ipfs-http-client";
+
+import toast from "react-hot-toast";
 
 interface pageProps {}
 
 const Page: FC<pageProps> = ({}) => {
+  const ipfsClient = require("ipfs-http-client");
+  const projectId = "2FdliMGfWHQCzVYTtFlGQsknZvb";
+  const projectSecret = "2274a79139ff6fdb2f016d12f713dca1";
+  const auth =
+    "Basic " + Buffer.from(projectId + ":" + projectSecret).toString("base64");
+  const client = ipfsHttpClient({
+    host: "ipfs.infura.io",
+    port: 5001,
+    protocol: "https",
+    headers: {
+      authorization: auth,
+    },
+  });
+  const IPFSGateway = "https://ipfs.io/ipfs/";
   const [color, setColor] = useState<string>("#000");
   const { canvasRef, onMouseDown, clear } = useDraw(drawLine);
   const [width, setWidth] = useState<number>();
   const [account, setAccount] = useState<string>();
   const [nfts, setNfts] = useState([]);
   const [loadingState, setLoadingState] = useState("not-loaded");
-  const [fileUrl, setFileUrl] = useState(null);
+
   // create a timer that uses the time
   const [timer, setTimer] = useState(0);
   const [prompt, setPrompt] = useState("");
-  const [formInput, updateFormInput] = useState({
-    price: "",
-    supply: "",
-    royalty: "",
-    name: "",
-    description: "",
-  });
-  const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
+
+  const [fileUrl, setFileUrl] = useState(null);
+  const [file, setFile] = useState(null);
+  const [formInput, updateFormInput] = useState({
+    price: "",
+    name: "",
+    description: "",
+  });
+  const router = useRouter();
 
   function drawLine({ prevPoint, currentPoint, ctx }: Draw) {
     const { x: currX, y: currY } = currentPoint;
@@ -60,20 +79,6 @@ const Page: FC<pageProps> = ({}) => {
     getPromptAndTime();
   }, [account]);
 
-  const ipfsClient = require("ipfs-http-client");
-  const projectId = "2FdliMGfWHQCzVYTtFlGQsknZvb";
-  const projectSecret = "2274a79139ff6fdb2f016d12f713dca1";
-  const auth =
-    "Basic " + Buffer.from(projectId + ":" + projectSecret).toString("base64");
-  const client = ipfsClient.create({
-    host: "ipfs.infura.io",
-    port: 5001,
-    protocol: "https",
-    headers: {
-      authorization: auth,
-    },
-  });
-
   const loadBlockchainData = async () => {
     try {
       const web3 = new Web3(window.ethereum);
@@ -83,43 +88,6 @@ const Page: FC<pageProps> = ({}) => {
       console.log(err);
     }
   };
-
-  async function onChange(e) {
-    // upload image to IPFS
-    const file = e.target.files[0];
-    try {
-      const added = await client.add(file, {
-        progress: (prog: any) => console.log(`received: ${prog}`),
-      });
-      const url = `https://ipfs.io/ipfs/${added.path}`;
-      console.log(url);
-      setFileUrl(url);
-    } catch (error) {
-      console.log("Error uploading file: ", error);
-    }
-  }
-
-  async function uploadToIPFS() {
-    const { name, description, price, supply, royalty } = formInput;
-    if (!name || !description || !price || !supply || !royalty || !fileUrl) {
-      return;
-    } else {
-      // first, upload metadata to IPFS
-      const data = JSON.stringify({
-        name,
-        description,
-        image: fileUrl,
-      });
-      try {
-        const added = await client.add(data);
-        const url = `https://ipfs.io/ipfs/${added.path}`;
-        // after metadata is uploaded to IPFS, return the URL to use it in the transaction
-        return url;
-      } catch (error) {
-        console.log("Error uploading file: ", error);
-      }
-    }
-  }
 
   async function getPromptAndTime() {
     const web3 = new Web3(window.ethereum);
@@ -157,15 +125,72 @@ const Page: FC<pageProps> = ({}) => {
     return prompt;
   }
 
-  async function listNFTForSale() {
-    try {
-      // const web3Modal = new Web3Modal();
-      // const provider = await web3Modal.connect();
-      // const web3 = new Web3(provider);
-      // const url = await uploadToIPFS();
-      // const networkId = await web3.eth.net.getId();
+  async function onChange(e) {
+    // upload image to IPFS
+    const file = e.target.files[0];
 
-      // do the code above but do not use web3Modal
+    try {
+      const added = await client.add(file, {
+        progress: (prog) => console.log(`received: ${prog}`),
+      });
+      const url = `${IPFSGateway}${added.path}`;
+      setFileUrl(url);
+    } catch (error) {
+      console.log("Error uploading file: ", error);
+    }
+  }
+
+  async function uploadToIPFS() {
+    const { name, description, price } = formInput;
+    if (!name || !description || !price || !fileUrl) {
+      return;
+    } else {
+      // first, upload metadata to IPFS
+      const data = JSON.stringify({
+        name,
+        description,
+        image: fileUrl,
+      });
+      try {
+        const added = await client.add(data);
+        const url = `https://ipfs.io/ipfs/${added.path}`;
+        // after metadata is uploaded to IPFS, return the URL to use it in the transaction
+        return url;
+      } catch (error) {
+        console.log("Error uploading file: ", error);
+      }
+    }
+  }
+
+  // create a function that takes id="canvas" and returns an ipfs hash
+  async function uploadCanvas() {
+    const canvas = document.getElementById("canvas");
+    const dataURL = canvas.toDataURL();
+    const blob = await fetch(dataURL).then((r) => r.blob());
+    const file = new File([blob], "image.png", { type: "image/png" });
+    try {
+      const added = await client.add(file, {
+        progress: (prog) => console.log(`received: ${prog}`),
+      });
+      const url = `${IPFSGateway}${added.path}`;
+      console.log(url);
+      return url;
+    } catch (error) {
+      console.log("Error uploading file: ", error);
+    }
+  }
+
+  async function listNFTForSale() {
+    const notification = toast.loading(
+      "Please confirm both transactions to create doodl...",
+      {
+        style: {
+          border: "2px solid #000",
+        },
+      }
+    );
+
+    try {
       const web3 = new Web3(window.ethereum);
       const provider = await window.ethereum.request({
         method: "eth_requestAccounts",
@@ -181,9 +206,9 @@ const Page: FC<pageProps> = ({}) => {
         Marketplace.abi,
         Marketplace.networks[networkId].address
       );
+
       let listingFee = await marketPlaceContract.methods.getListingFee().call();
       listingFee = listingFee.toString();
-      setLoading(true);
       NFTContract.methods
         .mint(url)
         .send({ from: accounts[0] })
@@ -195,45 +220,49 @@ const Page: FC<pageProps> = ({}) => {
             .listNft(
               NFTContractAddress,
               tokenId,
-              Web3.utils.toWei(formInput.price, "ether"),
-              formInput.supply,
-              formInput.royalty
+              Web3.utils.toWei(formInput.price, "ether")
             )
             .send({ from: accounts[0], value: listingFee })
             .on("receipt", function () {
               console.log("listed");
-              // toast.success("Stem created", { id: notification });
-              // create a custom toast that has a black border 2px
-              toast.success("NFT listed", {
+              toast.success("doodl listed successfully!", {
                 id: notification,
                 style: {
                   border: "2px solid #000",
                 },
               });
-
-              setLoading(false);
-              // wait 2 seconds, then reload the page
               setTimeout(() => {
-                router.push("/marketplace");
-              }, 2000);
+                // take the user to the / page
+                window.location.href = "/";
+              }, 3000);
             });
         });
-    } catch (error) {
-      console.log(error);
-      toast.error("Error creating stem", { id: notification });
+    } catch (err) {
+      console.log(err);
+      toast.error("Error listing doodl. Please fill out the form correctly.", {
+        id: notification,
+        style: {
+          border: "2px solid #000",
+        },
+      });
     }
   }
 
-  // const downloadCanvas = () => {
-  //   const canvas = document.getElementById("canvas");
-  //   const image = canvas
-  //     .toDataURL("image/png", 1.0)
-  //     .replace("image/png", "image/octet-stream");
-  //   const link = document.createElement("a");
-  //   link.download = "my-image.png";
-  //   link.href = image;
-  //   link.click();
-  // };
+  const downloadCanvas = () => {
+    const canvas = document.getElementById("canvas");
+    const image = canvas
+      .toDataURL("image/png", 1.0)
+      .replace("image/png", "image/octet-stream");
+    const link = document.createElement("a");
+    link.download = "my-image.png";
+    link.href = image;
+    link.click();
+    toast.success("Canvas downloaded!", {
+      style: {
+        border: "2px solid #000",
+      },
+    });
+  };
 
   return (
     <>
@@ -277,24 +306,33 @@ const Page: FC<pageProps> = ({}) => {
                   min="0"
                   max="100"
                   className="range"
-                  defaultValue={10}
+                  defaultValue={5}
                   onChange={(e) => setWidth(parseInt(e.target.value))}
                 />
+                {/* little p tag that says the value of the stroke width */}
+                <p className="text-center">{width}</p>
               </div>
               <button
                 type="button"
                 className="p-2 rounded-md border border-black"
-                onClick={clear}
+                onClick={() => {
+                  clear();
+                  toast.success("Canvas cleared!", {
+                    style: {
+                      border: "2px solid #000",
+                    },
+                  });
+                }}
               >
-                Clear
+                clear
               </button>
 
-              <button
-                type="button"
-                className="p-2 rounded-md border border-black"
+              <label
+                htmlFor="my-modal-6"
+                className="p-2 rounded-md border border-black text-center"
               >
-                Mint!
-              </button>
+                submit!
+              </label>
             </div>
           </div>
           <div>
@@ -307,6 +345,87 @@ const Page: FC<pageProps> = ({}) => {
               className="border border-black rounded-md"
               id="canvas"
             />
+          </div>
+        </div>
+      </div>
+
+      <input type="checkbox" id="my-modal-6" className="modal-toggle" />
+      <div className="modal modal-bottom sm:modal-middle">
+        <div className="modal-box">
+          <div className="flex flex-col gap-2">
+            <label htmlFor="price">
+              please confirm the following
+              {/* span red asterisk */}
+              <span className="text-red-500">*</span>
+            </label>
+            <input
+              placeholder="wallet address or ENS (automatically resolved)"
+              className="input input-bordered border rounded"
+              onChange={(e) =>
+                updateFormInput({ ...formInput, name: e.target.value })
+              }
+            />
+
+            <input
+              placeholder="What is the prompt of the day?"
+              className="mt-2 input input-bordered rounded p-4"
+              required
+              onChange={(e) =>
+                updateFormInput({ ...formInput, description: e.target.value })
+              }
+            />
+            <input
+              placeholder="Asset Price in MATIC if you win :)"
+              // require it to say 5
+              required
+              className="mt-2 border rounded p-4 input input-bordered"
+              onChange={(e) =>
+                updateFormInput({ ...formInput, price: e.target.value })
+              }
+            />
+            <label htmlFor="price">
+              For regulatory purposes, please manually import your doodl <br />
+              1. Click the "download" button below, this will automatically
+              download your stem as a png file <br />
+              2. Choose the file you just downloaded <br />
+              3. Click "submit" <br />
+              4. Wait for the voting period!
+            </label>
+            <div
+              onClick={downloadCanvas}
+              className="relative inline-block px-4 py-2 font-medium group cursor-pointer"
+            >
+              <span className="absolute inset-0 w-full h-full transition duration-200 ease-out transform translate-x-1 translate-y-1 bg-[#A7C7E7] border-black border-[2px] group-hover:-translate-x-0 group-hover:-translate-y-0"></span>
+              <span className="absolute inset-0 w-full h-full bg-white border-2 border-black group-hover:bg-[#A7C7E7]"></span>
+              <span className="relative text-black group-hover:text-black">
+                Download
+              </span>
+            </div>
+            <input
+              type="file"
+              name="Asset"
+              className="my-4"
+              onChange={onChange}
+              required
+            />
+            <label className="text-center" htmlFor="price">
+              BE ALERT: ALL DOODLS WILL BE VERIFIED.
+            </label>
+            <div
+              onClick={listNFTForSale}
+              className="relative inline-block px-4 py-2 font-medium group cursor-pointer"
+            >
+              <span className="absolute inset-0 w-full h-full transition duration-200 ease-out transform translate-x-1 translate-y-1 bg-[#FF6F91] border-black border-[2px] group-hover:-translate-x-0 group-hover:-translate-y-0"></span>
+              <span className="absolute inset-0 w-full h-full bg-white border-2 border-black group-hover:bg-[#FF6F91]"></span>
+              <span className="relative text-black group-hover:text-black">
+                Submit
+              </span>
+            </div>
+          </div>
+          <div className="modal-action">
+            <label htmlFor="my-modal-6" className="btn">
+              cancel
+            </label>
           </div>
         </div>
       </div>

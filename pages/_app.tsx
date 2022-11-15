@@ -7,6 +7,9 @@ import Footer from "../components/Footer";
 import Web3 from "web3";
 import { useEffect, useState } from "react";
 
+import { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
+
 function MyApp({ Component, pageProps }: AppProps) {
   const [account, setAccount] = useState("");
   const [web3, setWeb3] = useState<Web3>();
@@ -26,6 +29,11 @@ function MyApp({ Component, pageProps }: AppProps) {
   };
 
   const Web3Handler = async () => {
+    const notification = toast.loading("Connecting account...", {
+      style: {
+        border: "2px solid #000",
+      },
+    });
     try {
       const account = await window.ethereum.request({
         method: "eth_requestAccounts",
@@ -34,8 +42,14 @@ function MyApp({ Component, pageProps }: AppProps) {
       const web3 = new Web3(window.ethereum);
       setAccount(account[0]);
       setWeb3(web3);
+      toast.success("Account connected", {
+        id: notification,
+      });
     } catch (err) {
       console.log(err);
+      toast.error("Account not connected", {
+        id: notification,
+      });
     }
   };
   return (
@@ -43,6 +57,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <Navbar Web3Handler={Web3Handler} account={account} />
       <Component {...pageProps} Web3Handler={Web3Handler} account={account} />
       <Footer />
+      <Toaster />
     </>
   );
 }
