@@ -145,40 +145,44 @@ const index = ({ Web3Handler, account }) => {
 
   return (
     <>
-      <Marquee
-        gradient={false}
-        speed={30}
-        // left to right
-        direction="right"
-        className="border-t border-b border-black"
-      >
-        <div className="stats rounded-none ">
-          <div className="stat">
-            <div className=" text-black">doodls</div>
-            <div className="stat-value text-center">{nfts.length}</div>
-          </div>
-        </div>
-        <div className="stats rounded-none ">
-          <div className="stat">
-            <div className=" text-black text-center">prize pool (MATIC)</div>
-            <div className="stat-value text-center">{prizePool}</div>
-          </div>
-        </div>
-        <div className="stats rounded-none ">
-          <div className="stat">
-            <div className=" text-black text-center">time remaining</div>
-            <div className="stat-value text-center">
-              {hours} hours {minutes} minutes
+      {account ? (
+        <Marquee
+          gradient={false}
+          speed={30}
+          // left to right
+          direction="right"
+          className="border-t border-b border-black"
+        >
+          <div className="stats rounded-none ">
+            <div className="stat">
+              <div className=" text-black">doodls</div>
+              <div className="stat-value text-center">{nfts.length}</div>
             </div>
           </div>
-        </div>
-        <div className="stats rounded-none ">
-          <div className="stat">
-            <div className=" text-black text-center">prompt</div>
-            <div className="stat-value text-center">{prompt}</div>
+          <div className="stats rounded-none ">
+            <div className="stat">
+              <div className=" text-black text-center">prize pool (MATIC)</div>
+              <div className="stat-value text-center">{prizePool}</div>
+            </div>
           </div>
-        </div>
-      </Marquee>
+          <div className="stats rounded-none ">
+            <div className="stat">
+              <div className=" text-black text-center">time remaining</div>
+              <div className="stat-value text-center">
+                {hours} hours {minutes} minutes
+              </div>
+            </div>
+          </div>
+          <div className="stats rounded-none ">
+            <div className="stat">
+              <div className=" text-black text-center">prompt</div>
+              <div className="stat-value text-center">{prompt}</div>
+            </div>
+          </div>
+        </Marquee>
+      ) : (
+        <div className="stats rounded-none "></div>
+      )}
       <div className="hero bg-base-200 pr-12 pl-12 pt-6 pb-6">
         <div className="hero-content flex-col lg:flex-row ">
           <Image src="/paint.png" width={500} height={500} alt="paint" />
