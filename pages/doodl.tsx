@@ -314,7 +314,7 @@ const Page: FC<pageProps> = ({}) => {
               </div>
               <button
                 type="button"
-                className="p-2 rounded-md border border-black"
+                className="p-2 rounded-md border border-black btn btn-outline"
                 onClick={() => {
                   clear();
                   toast.success("Canvas cleared!", {
@@ -329,7 +329,7 @@ const Page: FC<pageProps> = ({}) => {
 
               <label
                 htmlFor="my-modal-6"
-                className="p-2 rounded-md border border-black text-center"
+                className="p-2 rounded-md border border-black text-center cursor-pointer btn btn-outline"
               >
                 submit!
               </label>

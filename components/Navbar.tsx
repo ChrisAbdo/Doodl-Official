@@ -4,7 +4,7 @@ import React from "react";
 const Navbar = ({ Web3Handler, account }) => {
   return (
     <>
-      <div className="navbar bg-base-100 pr-7 pl-5">
+      <div className="navbar  pr-7 pl-5 sticky top-0 z-50 bg-white">
         <div className="navbar-start">
           <Image
             src="/logo.png"

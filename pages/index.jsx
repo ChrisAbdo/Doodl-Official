@@ -10,6 +10,7 @@ import { create as ipfsHttpClient } from "ipfs-http-client";
 
 const index = ({ Web3Handler, account }) => {
   const [loading, setLoading] = useState(true);
+  const [prizePool, setPrizePool] = useState(0);
   const [web3, setWeb3] = useState(null);
   const [nfts, setNfts] = useState([]);
   const [loadingState, setLoadingState] = useState("not-loaded");
@@ -21,11 +22,17 @@ const index = ({ Web3Handler, account }) => {
     name: "",
     description: "",
   });
+  const [prompt, setPrompt] = useState(false);
+  const [hours, setHours] = useState(0);
+  const [minutes, setMinutes] = useState(0);
+  const [seconds, setSeconds] = useState(0);
+  const [timer, setTimer] = useState(0);
   const router = useRouter();
 
   useEffect(() => {
     loadBlockchainData();
     loadNFTs();
+    getPromptAndTime();
   }, []);
 
   const projectId = "2FdliMGfWHQCzVYTtFlGQsknZvb";
@@ -94,34 +101,86 @@ const index = ({ Web3Handler, account }) => {
     setNfts(nfts.filter((nft) => nft !== null));
     setLoadingState("loaded");
     setLoading(false);
+    // const prizePool should be the highest token id * 0.0001, only display 4 decimals
+
+    const prizePool = nfts.length * 0.0001;
+    setPrizePool((nfts.length * 0.0001).toFixed(4));
   }
 
-  async function buyNft(nft) {
-    // const notification = toast.loading("Buying Stem...");
-    // black border toast notification
+  async function getPromptAndTime() {
+    const web3 = new Web3(window.ethereum);
+    const networkId = await web3.eth.net.getId();
 
-    try {
-      const web3 = new Web3(window.ethereum);
+    // Mint the NFT
+    const NFTContractAddress = NFT.networks[networkId].address;
+    const NFTContract = new web3.eth.Contract(NFT.abi, NFTContractAddress);
+    const accounts = await web3.eth.getAccounts();
+    const marketPlaceContract = new web3.eth.Contract(
+      Marketplace.abi,
+      Marketplace.networks[networkId].address
+    );
+    const prompt = await marketPlaceContract.methods.getPrompt().call();
+    setPrompt(prompt);
+    const time = await marketPlaceContract.methods.getTimeLeft().call();
+    // convert the time to hours minutes and seconds
+    // const minutes = Math.floor(time / 60);
+    // setTimer(minutes);
+    const hours = Math.floor(time / 3600);
+    setHours(hours);
+    const minutes = Math.floor((time % 3600) / 60);
+    setMinutes(minutes);
+    const seconds = Math.floor((time % 3600) % 60);
+    setSeconds(seconds);
+    setTimer(hours * 60 + minutes);
 
-      const networkId = await web3.eth.net.getId();
-      const marketPlaceContract = new web3.eth.Contract(
-        Marketplace.abi,
-        Marketplace.networks[networkId].address
-      );
-      const accounts = await web3.eth.getAccounts();
-      await marketPlaceContract.methods
-        .buyNft(NFT.networks[networkId].address, nft.tokenId)
-        .send({ from: accounts[0], to: nft.seller, value: nft.price });
+    // force this component to re-render every second without refreshing the page
+    setTimeout(() => {
+      getPromptAndTime();
+    }, 1000);
 
-      loadNFTs();
-    } catch (err) {
-      console.log(err);
-    }
+    // console log it in a readable format
+    console.log(`Prompt: ${prompt}\nTime: ${time}`);
+    return prompt;
   }
+
   return (
     <>
+      <Marquee
+        gradient={false}
+        speed={30}
+        // left to right
+        direction="right"
+        className="border-t border-b border-black"
+      >
+        <div className="stats rounded-none ">
+          <div className="stat">
+            <div className=" text-black">doodls</div>
+            <div className="stat-value text-center">{nfts.length}</div>
+          </div>
+        </div>
+        <div className="stats rounded-none ">
+          <div className="stat">
+            <div className=" text-black text-center">prize pool</div>
+            <div className="stat-value text-center">{prizePool}</div>
+          </div>
+        </div>
+        <div className="stats rounded-none ">
+          <div className="stat">
+            <div className=" text-black text-center">time remaining</div>
+            <div className="stat-value text-center">
+              {hours} hours {minutes} minutes
+            </div>
+          </div>
+        </div>
+        <div className="stats rounded-none ">
+          <div className="stat">
+            <div className=" text-black text-center">prompt</div>
+            <div className="stat-value text-center">{prompt}</div>
+          </div>
+        </div>
+      </Marquee>
       <div className="hero bg-base-200 pr-12 pl-12 pt-6 pb-6">
-        <div className="hero-content flex-col lg:flex-row">
+        <div className="hero-content flex-col lg:flex-row ">
           <Image src="/paint.png" width={500} height={500} alt="paint" />
           <div>
             <div className="flex flex-col space-y-2 text-5xl sm:text-6xl font-bold">
@@ -141,6 +200,7 @@ const index = ({ Web3Handler, account }) => {
             <p className="py-6 text-2xl">
               doodl is a blockchain based art competition where you draw the
               weekly prompt and the community votes on the best submission.
+              winner gets 100% of the pot.
             </p>
 
             {account ? (
@@ -209,71 +269,74 @@ const index = ({ Web3Handler, account }) => {
 
       {/* map the nfts in a grid with columns, they should fill up in rows as they come in */}
       {loading ? (
-        <div class="flex justify-center items-center mt-12  space-x-2">
+        <div className="flex justify-center items-center mt-12  space-x-2">
           <div
-            class="spinner-grow inline-block w-8 h-8 bg-current rounded-full opacity-0 text-blue-600"
+            className="spinner-grow inline-block w-8 h-8 bg-current rounded-full opacity-0 text-blue-600"
             role="status"
           >
-            <span class="visually-hidden">Loading...</span>
+            <span className="visually-hidden">Loading...</span>
           </div>
           <div
-            class="
+            className="
       spinner-grow inline-block w-8 h-8 bg-current rounded-full opacity-0
         text-purple-500
       "
             role="status"
           >
-            <span class="visually-hidden">Loading...</span>
+            <span className="visually-hidden">Loading...</span>
           </div>
           <div
-            class="
+            className="
       spinner-grow inline-block w-8 h-8 bg-current rounded-full opacity-0
         text-green-500
       "
             role="status"
           >
-            <span class="visually-hidden">Loading...</span>
+            <span className="visually-hidden">Loading...</span>
           </div>
           <div
-            class="spinner-grow inline-block w-8 h-8 bg-current rounded-full opacity-0 text-red-500"
+            className="spinner-grow inline-block w-8 h-8 bg-current rounded-full opacity-0 text-red-500"
             role="status"
           >
-            <span class="visually-hidden">Loading...</span>
+            <span className="visually-hidden">Loading...</span>
           </div>
           <div
-            class="
+            className="
       spinner-grow inline-block w-8 h-8 bg-current rounded-full opacity-0
         text-yellow-500
       "
             role="status"
           >
-            <span class="visually-hidden">Loading...</span>
+            <span className="visually-hidden">Loading...</span>
           </div>
           <div
-            class="spinner-grow inline-block w-8 h-8 bg-current rounded-full opacity-0 text-blue-300"
+            className="spinner-grow inline-block w-8 h-8 bg-current rounded-full opacity-0 text-blue-300"
             role="status"
           >
-            <span class="visually-hidden">Loading...</span>
+            <span className="visually-hidden">Loading...</span>
           </div>
           <div
-            class="spinner-grow inline-block w-8 h-8 bg-current rounded-full opacity-0 text-gray-300"
+            className="spinner-grow inline-block w-8 h-8 bg-current rounded-full opacity-0 text-gray-300"
             role="status"
           >
-            <span class="visually-hidden">Loading...</span>
+            <span className="visually-hidden">Loading...</span>
           </div>
         </div>
       ) : null}
       <h1 className="text-4xl font-bold text-center mt-4">Recent Doodls</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-20">
         {nfts.map((nft, i) => (
-          <div key={i} className="border shadow rounded-xl overflow-hidden">
-            <Image src={nft.image} width={500} height={500} />
+          <div
+            key={i}
+            className="border border-black rounded-xl overflow-hidden"
+          >
+            <Image src={nft.image} width={500} height={500} alt="doodl" />
             <div className="p-4 bg-black">
               <p
                 style={{ height: "64px" }}
                 className="text-2xl font-bold text-white"
               >
-                {nft.name}
+                {nft.name > 10 ? nft.name.substring(0, 14) + "..." : nft.name}
               </p>
             </div>
           </div>
