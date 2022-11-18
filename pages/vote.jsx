@@ -7,6 +7,7 @@ import Web3 from "web3";
 import { useRouter } from "next/router";
 import axios from "axios";
 import { create as ipfsHttpClient } from "ipfs-http-client";
+import toast from "react-hot-toast";
 
 const vote = ({ Web3Handler, account }) => {
   const [loading, setLoading] = useState(true);
@@ -99,15 +100,6 @@ const vote = ({ Web3Handler, account }) => {
             .call();
           nft.voteCount = voteCount;
           setVoteCount(voteCount);
-          console.log(voteCount);
-
-          // update the vote count every 5 seconds to show the latest vote count but don't update the UI
-          setInterval(async () => {
-            const voteCount = await marketPlaceContract.methods
-              .getVoteCount(nft.tokenId)
-              .call();
-            nft.voteCount = voteCount;
-          }, 5000);
 
           return nft;
         } catch (err) {
@@ -156,25 +148,51 @@ const vote = ({ Web3Handler, account }) => {
       getPromptAndTime();
     }, 1000);
 
-    // console log it in a readable format
-    console.log(`Prompt: ${prompt}\nTime: ${time}`);
     return prompt;
   }
 
   // function to vote for nft, uses voteNFT method in marketplace contract
   async function voteNFT(nft) {
-    const web3 = new Web3(window.ethereum);
-    const networkId = await web3.eth.net.getId();
-    const marketPlaceContract = new web3.eth.Contract(
-      Marketplace.abi,
-      Marketplace.networks[networkId].address
-    );
-    const accounts = await web3.eth.getAccounts();
-    const vote = await marketPlaceContract.methods
-      .voteNFT(nft.tokenId)
-      .send({ from: accounts[0] });
-    setVote(vote);
-    console.log(vote);
+    const notification = toast.loading("Submitting vote...", {
+      style: {
+        border: "2px solid #000",
+      },
+    });
+
+    try {
+      const web3 = new Web3(window.ethereum);
+      const networkId = await web3.eth.net.getId();
+      const marketPlaceContract = new web3.eth.Contract(
+        Marketplace.abi,
+        Marketplace.networks[networkId].address
+      );
+      const accounts = await web3.eth.getAccounts();
+      const vote = await marketPlaceContract.methods
+        .voteNFT(nft.tokenId)
+        .send({ from: accounts[0] });
+
+      setVote(vote);
+      console.log(vote);
+      toast.success("Thank you for voting!", {
+        id: notification,
+        style: {
+          border: "2px solid #000",
+        },
+      });
+      // wait 5 seconds and then refresh the page after voting
+      setTimeout(() => {
+        window.location.reload();
+      }, 5000);
+    } catch (err) {
+      console.log(err);
+      toast.error("Error voting!", {
+        id: notification,
+        style: {
+          border: "2px solid #000",
+        },
+      });
+    }
+
     // loadNFTs();
   }
 
@@ -207,18 +225,18 @@ const vote = ({ Web3Handler, account }) => {
             className="border border-black rounded-xl overflow-hidden"
           >
             <Image src={nft.image} width={500} height={500} alt="doodl" />
-            <div className="p-4 bg-black">
-              <p className="text-2xl font-bold text-white">
+            <div className="p-4 ">
+              <p className="text-2xl font-bold ">
                 {nft.name > 10 ? nft.name.substring(0, 14) + "..." : nft.name}
               </p>
-              <p className="text-2xl font-bold text-white">
+              <p className="text-2xl font-bold ">
                 {/* vote count */}
                 {nft.voteCount} votes
               </p>
 
               <button
                 onClick={() => voteNFT(nft)}
-                className="w-full bg-pink-500 text-white font-bold py-2 px-12 rounded"
+                className="w-full bg-pink-500  font-bold py-2 px-12 rounded"
               >
                 Vote
               </button>

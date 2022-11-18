@@ -137,9 +137,6 @@ const index = ({ Web3Handler, account }) => {
     setTimeout(() => {
       getPromptAndTime();
     }, 1000);
-
-    // console log it in a readable format
-    console.log(`Prompt: ${prompt}\nTime: ${time}`);
     return prompt;
   }
 
