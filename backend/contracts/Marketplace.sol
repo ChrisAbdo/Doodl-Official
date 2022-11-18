@@ -25,24 +25,36 @@ contract Marketplace is ReentrancyGuard {
         address payable owner;
         uint256 price;
         bool listed;
+        uint256 voteCount;
     }
     event NFTListed(
         address nftContract,
         uint256 tokenId,
         address seller,
         address owner,
-        uint256 price
+        uint256 price,
+        uint256 voteCount
     );
     event NFTSold(
         address nftContract,
         uint256 tokenId,
         address seller,
         address owner,
-        uint256 price
+        uint256 price,
+        uint256 voteCount
     );
 
     constructor() {
         _marketOwner = payable(msg.sender);
+    }
+
+    function voteNFT(uint256 _tokenId) public payable {
+        //  increment vote count for NFT
+        _idToNFT[_tokenId].voteCount++;
+    }
+
+    function getVoteCount(uint256 _tokenId) public view returns (uint256) {
+        return _idToNFT[_tokenId].voteCount;
     }
 
     function getPrompt() public view returns (string memory) {
@@ -76,7 +88,8 @@ contract Marketplace is ReentrancyGuard {
             payable(msg.sender),
             payable(address(this)),
             _price,
-            true
+            true,
+            0
         );
 
         emit NFTListed(
@@ -84,7 +97,8 @@ contract Marketplace is ReentrancyGuard {
             _tokenId,
             msg.sender,
             address(this),
-            _price
+            _price,
+            0
         );
     }
 
@@ -110,7 +124,8 @@ contract Marketplace is ReentrancyGuard {
             _tokenId,
             msg.sender,
             address(this),
-            _price
+            _price,
+            0
         );
     }
 
@@ -134,7 +149,14 @@ contract Marketplace is ReentrancyGuard {
         nft.listed = false;
 
         _nftsSold.increment();
-        emit NFTSold(_nftContract, nft.tokenId, nft.seller, buyer, msg.value);
+        emit NFTSold(
+            _nftContract,
+            nft.tokenId,
+            nft.seller,
+            buyer,
+            msg.value,
+            nft.voteCount
+        );
     }
 
     function getListingFee() public view returns (uint256) {
