@@ -312,20 +312,7 @@ const Page: FC<pageProps> = ({}) => {
                 {/* little p tag that says the value of the stroke width */}
                 <p className="text-center">{width}</p>
               </div>
-              {/* <button
-                type="button"
-                className="p-2 rounded-md border border-black btn btn-outline"
-                onClick={() => {
-                  clear();
-                  toast.success("Canvas cleared!", {
-                    style: {
-                      border: "2px solid #000",
-                    },
-                  });
-                }}
-              >
-                clear
-              </button> */}
+
               <div
                 onClick={() => {
                   clear();
