@@ -236,9 +236,13 @@ const vote = ({ Web3Handler, account }) => {
 
               <button
                 onClick={() => voteNFT(nft)}
-                className="w-full bg-pink-500  font-bold py-2 px-12 rounded"
+                className="relative inline-block px-4 py-2 font-medium group cursor-pointer w-full mt-2"
               >
-                Vote
+                <span className="absolute inset-0 w-full h-full transition duration-200 ease-out transform translate-x-1 translate-y-1 bg-[#77dd77] border-black border-[2px] group-hover:-translate-x-0 group-hover:-translate-y-0"></span>
+                <span className="absolute inset-0 w-full h-full bg-white border-2 border-black group-hover:bg-[#77dd77]"></span>
+                <span className="relative text-black group-hover:text-black">
+                  vote!
+                </span>
               </button>
             </div>
           </div>

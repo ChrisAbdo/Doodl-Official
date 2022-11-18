@@ -12,6 +12,7 @@ import Web3 from "web3";
 import { create as ipfsHttpClient } from "ipfs-http-client";
 
 import toast from "react-hot-toast";
+import Link from "next/link";
 
 interface pageProps {}
 
@@ -352,7 +353,10 @@ const Page: FC<pageProps> = ({}) => {
               ) : (
                 <h1>
                   <span className="text-red-500">Time's up!</span> You can now
-                  vote for the best doodl.
+                  <Link className="font-bold text-red-500" href="/vote">
+                    vote
+                  </Link>
+                  for the best doodl.
                 </h1>
               )}
             </div>
