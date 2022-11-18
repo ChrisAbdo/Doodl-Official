@@ -196,58 +196,100 @@ const vote = ({ Web3Handler, account }) => {
     // loadNFTs();
   }
 
-  // function that gets the vote count for every nft, this uses getVoteCount method in marketplace contract
-  async function getVoteCount(nft) {
-    const web3 = new Web3(window.ethereum);
-    const networkId = await web3.eth.net.getId();
-    const marketPlaceContract = new web3.eth.Contract(
-      Marketplace.abi,
-      Marketplace.networks[networkId].address
-    );
-    const accounts = await web3.eth.getAccounts();
-    const voteCount = await marketPlaceContract.methods
-      .getVoteCount(nft.tokenId)
-      .call();
-    setVoteCount(voteCount);
-    console.log(voteCount);
-    return voteCount;
-  }
-
   return (
     <>
       <h1 className="text-4xl font-bold text-center mt-4">
         Vote for your favorite doodl!
       </h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-20">
-        {nfts.map((nft, i) => (
-          <div
-            key={i}
-            className="border border-black rounded-xl overflow-hidden"
-          >
-            <Image src={nft.image} width={500} height={500} alt="doodl" />
-            <div className="p-4 ">
-              <p className="text-2xl font-bold ">
-                {nft.name > 10 ? nft.name.substring(0, 14) + "..." : nft.name}
-              </p>
-              <p className="text-2xl font-bold ">
-                {/* vote count */}
-                {nft.voteCount} votes
-              </p>
 
-              <button
-                onClick={() => voteNFT(nft)}
-                className="relative inline-block px-4 py-2 font-medium group cursor-pointer w-full mt-2"
-              >
-                <span className="absolute inset-0 w-full h-full transition duration-200 ease-out transform translate-x-1 translate-y-1 bg-[#77dd77] border-black border-[2px] group-hover:-translate-x-0 group-hover:-translate-y-0"></span>
-                <span className="absolute inset-0 w-full h-full bg-white border-2 border-black group-hover:bg-[#77dd77]"></span>
-                <span className="relative text-black group-hover:text-black">
-                  vote!
-                </span>
-              </button>
-            </div>
+      {loading ? (
+        <div className="flex justify-center items-center mt-12  space-x-2">
+          <div
+            className="spinner-grow inline-block w-8 h-8 bg-current rounded-full opacity-0 text-blue-600"
+            role="status"
+          >
+            <span className="visually-hidden">Loading...</span>
           </div>
-        ))}
-      </div>
+          <div
+            className="
+      spinner-grow inline-block w-8 h-8 bg-current rounded-full opacity-0
+        text-purple-500
+      "
+            role="status"
+          >
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <div
+            className="
+      spinner-grow inline-block w-8 h-8 bg-current rounded-full opacity-0
+        text-green-500
+      "
+            role="status"
+          >
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <div
+            className="spinner-grow inline-block w-8 h-8 bg-current rounded-full opacity-0 text-red-500"
+            role="status"
+          >
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <div
+            className="
+      spinner-grow inline-block w-8 h-8 bg-current rounded-full opacity-0
+        text-yellow-500
+      "
+            role="status"
+          >
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <div
+            className="spinner-grow inline-block w-8 h-8 bg-current rounded-full opacity-0 text-blue-300"
+            role="status"
+          >
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <div
+            className="spinner-grow inline-block w-8 h-8 bg-current rounded-full opacity-0 text-gray-300"
+            role="status"
+          >
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-20">
+          {nfts.map((nft, i) => (
+            <div
+              key={i}
+              className="border border-black rounded-xl overflow-hidden"
+            >
+              <Image src={nft.image} width={600} height={600} alt="doodl" />
+              <div className="p-4 border-t border-black">
+                <p className="text-2xl font-bold ">
+                  {nft.name > 10 ? nft.name.substring(0, 14) + "..." : nft.name}
+                </p>
+                <p className="text-2xl font-bold ">
+                  {/* vote count */}
+                  {/* {nft.voteCount} votes */}
+                  {/* if it has 1 vote, say vote, but if it has more than one, say votes */}
+                  {nft.voteCount} votes
+                </p>
+
+                <button
+                  onClick={() => voteNFT(nft)}
+                  className="relative inline-block px-4 py-2 font-medium group cursor-pointer w-full mt-2"
+                >
+                  <span className="absolute inset-0 w-full h-full transition duration-200 ease-out transform translate-x-1 translate-y-1 bg-[#77dd77] border-black border-[2px] group-hover:-translate-x-0 group-hover:-translate-y-0"></span>
+                  <span className="absolute inset-0 w-full h-full bg-white border-2 border-black group-hover:bg-[#77dd77]"></span>
+                  <span className="relative text-black group-hover:text-black">
+                    vote!
+                  </span>
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </>
   );
 };

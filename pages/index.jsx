@@ -340,7 +340,9 @@ const index = ({ Web3Handler, account }) => {
           </div>
         </div>
       ) : null}
-      <h1 className="text-4xl font-bold text-center mt-4">Recent Doodls</h1>
+      <h1 className="text-4xl font-bold text-center mt-4">
+        your current competition &darr;
+      </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-20">
         {nfts.map((nft, i) => (
           <div

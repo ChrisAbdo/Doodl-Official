@@ -37,6 +37,7 @@ const Page: FC<pageProps> = ({}) => {
   const [account, setAccount] = useState<string>();
   const [nfts, setNfts] = useState([]);
   const [loadingState, setLoadingState] = useState("not-loaded");
+  const [errorPrompt, setErrorPrompt] = useState("");
 
   // create a timer that uses the time
   const [timer, setTimer] = useState(0);
@@ -270,7 +271,9 @@ const Page: FC<pageProps> = ({}) => {
       <div className="flex items-center text-center justify-center">
         <div className="card rounded-none w-96 bg-base-100 border border-black text-center items-center">
           <div className="card-body text-center  justify-center items-center">
-            <h2 className="card-title font-extrabold">PROMPT:</h2>
+            <h2 id="prompt" className="card-title font-extrabold">
+              PROMPT:
+            </h2>
             <h2 className="card-title text-2xl">{prompt}</h2>
 
             <br />
@@ -380,12 +383,13 @@ const Page: FC<pageProps> = ({}) => {
         <div className="modal-box">
           <div className="flex flex-col gap-2">
             <label htmlFor="price">
-              please confirm the following
+              please confirm the following to receive your funds if you win:
               {/* span red asterisk */}
               <span className="text-red-500">*</span>
             </label>
             <input
-              placeholder="wallet address or ENS (automatically resolved)"
+              placeholder="wallet address or ENS (automatically resolved)."
+              required
               className="input input-bordered border rounded"
               onChange={(e) =>
                 updateFormInput({ ...formInput, name: e.target.value })
@@ -393,15 +397,16 @@ const Page: FC<pageProps> = ({}) => {
             />
 
             <input
-              placeholder="What is the prompt of the day?"
+              placeholder="did you enjoy participating in this event?"
               className="mt-2 input input-bordered rounded p-4"
               required
+              id="promptInput"
               onChange={(e) =>
                 updateFormInput({ ...formInput, description: e.target.value })
               }
             />
             <input
-              placeholder="Asset Price in MATIC if you win :)"
+              placeholder="price for others to mint in MATIC if you win :)"
               // require it to say 5
               required
               className="mt-2 border rounded p-4 input input-bordered"
@@ -412,7 +417,7 @@ const Page: FC<pageProps> = ({}) => {
             <label htmlFor="price">
               For safety purposes, please manually import your doodl <br />
               1. Click the "download" button below, this will automatically
-              download your stem as a png file <br />
+              download your doodl as a png file <br />
               2. Choose the file you just downloaded <br />
               3. Click "submit" <br />
               4. Wait for the voting period!
@@ -424,7 +429,7 @@ const Page: FC<pageProps> = ({}) => {
               <span className="absolute inset-0 w-full h-full transition duration-200 ease-out transform translate-x-1 translate-y-1 bg-[#A7C7E7] border-black border-[2px] group-hover:-translate-x-0 group-hover:-translate-y-0"></span>
               <span className="absolute inset-0 w-full h-full bg-white border-2 border-black group-hover:bg-[#A7C7E7]"></span>
               <span className="relative text-black group-hover:text-black">
-                Download
+                download doodl
               </span>
             </div>
             <input
@@ -438,8 +443,6 @@ const Page: FC<pageProps> = ({}) => {
               BE ALERT: ALL DOODLS WILL BE VERIFIED.
             </label>
 
-            {/* if there is time left show this, otherwise display nothing */}
-
             <div
               onClick={listNFTForSale}
               className="relative inline-block px-4 py-2 font-medium group cursor-pointer text-center"
@@ -447,7 +450,7 @@ const Page: FC<pageProps> = ({}) => {
               <span className="absolute inset-0 w-full h-full transition duration-200 ease-out transform translate-x-1 translate-y-1 bg-[#77dd77] border-black border-[2px] group-hover:-translate-x-0 group-hover:-translate-y-0"></span>
               <span className="absolute inset-0 w-full h-full bg-white border-2 border-black group-hover:bg-[#77dd77]"></span>
               <span className="relative text-black group-hover:text-black">
-                Submit
+                submit
               </span>
             </div>
           </div>
