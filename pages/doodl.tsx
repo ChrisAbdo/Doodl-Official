@@ -353,9 +353,8 @@ const Page: FC<pageProps> = ({}) => {
               ) : (
                 <h1>
                   <span className="text-red-500">Time's up!</span> You can now
-                  &nbsp;
                   <Link className="font-bold text-red-500" href="/vote">
-                    &nbsp; vote
+                    &nbsp;vote&nbsp;
                   </Link>
                   for the best doodl.
                 </h1>
