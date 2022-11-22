@@ -7,6 +7,7 @@ import Web3 from "web3";
 import { useRouter } from "next/router";
 import axios from "axios";
 import { create as ipfsHttpClient } from "ipfs-http-client";
+import Head from "next/head";
 
 const index = ({ Web3Handler, account }) => {
   const [loading, setLoading] = useState(true);
@@ -142,6 +143,10 @@ const index = ({ Web3Handler, account }) => {
 
   return (
     <>
+      <Head>
+        <link rel="stylesheet" href="https://lens.xyz/widget-styles.css" />
+        <script async src="https://lens.xyz/widget.js"></script>
+      </Head>
       {account ? (
         <Marquee
           gradient={false}

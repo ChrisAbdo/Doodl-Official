@@ -8,6 +8,11 @@ import { useRouter } from "next/router";
 import axios from "axios";
 import { create as ipfsHttpClient } from "ipfs-http-client";
 import toast from "react-hot-toast";
+import { client, exploreProfiles } from "../api";
+import Head from "next/head";
+import Script from "next/script";
+import { LensShareButton } from "@infinity-keys/react-lens-share-button";
+import "@infinity-keys/react-lens-share-button/dist/style.css";
 
 const vote = ({ Web3Handler, account }) => {
   const [loading, setLoading] = useState(true);
@@ -30,12 +35,14 @@ const vote = ({ Web3Handler, account }) => {
   const [timer, setTimer] = useState(0);
   const [vote, setVote] = useState(0);
   const [voteCount, setVoteCount] = useState(0);
+  const [profiles, setProfiles] = useState([]);
   const router = useRouter();
 
   useEffect(() => {
     loadBlockchainData();
     loadNFTs();
     getPromptAndTime();
+    fetchProfiles();
   }, []);
 
   const projectId = "2FdliMGfWHQCzVYTtFlGQsknZvb";
@@ -50,8 +57,38 @@ const vote = ({ Web3Handler, account }) => {
       authorization: auth,
     },
   });
-
   const IPFSGateway = "https://ipfs.io/ipfs/";
+
+  async function fetchProfiles() {
+    try {
+      /* fetch profiles from Lens API */
+      let response = await client.query({ query: exploreProfiles });
+      /* loop over profiles, create properly formatted ipfs image links */
+      let profileData = await Promise.all(
+        response.data.exploreProfiles.items.map(async (profileInfo) => {
+          let profile = { ...profileInfo };
+          let picture = profile.picture;
+          if (picture && picture.original && picture.original.url) {
+            if (picture.original.url.startsWith("ipfs://")) {
+              let result = picture.original.url.substring(
+                7,
+                picture.original.url.length
+              );
+              profile.avatarUrl = `http://lens.infura-ipfs.io/ipfs/${result}`;
+            } else {
+              profile.avatarUrl = picture.original.url;
+            }
+          }
+          return profile;
+        })
+      );
+
+      /* update the local state with the profiles array */
+      setProfiles(profileData);
+    } catch (err) {
+      console.log({ err });
+    }
+  }
 
   const loadBlockchainData = async () => {
     try {
@@ -192,15 +229,40 @@ const vote = ({ Web3Handler, account }) => {
         },
       });
     }
-
-    // loadNFTs();
   }
 
   return (
     <>
+      <Script src="https://lens.xyz/widget.js" />
+      <link rel="stylesheet" href="https://lens.xyz/widget-styles.css" />
+
       <h1 className="text-4xl font-bold text-center mt-4">
         Vote for your favorite doodl!
       </h1>
+
+      {profiles.map((profile) => (
+        <div
+          key={profile.id}
+          className="w-2/3 shadow-md p-6 rounded-lg mb-8 flex flex-col items-center"
+        >
+          <img
+            className="w-48"
+            src={profile.avatarUrl || "https://picsum.photos/200"}
+          />
+          <p className="text-xl text-center mt-6">{profile.name}</p>
+          <p className="text-base text-gray-400  text-center mt-2">
+            {profile.bio}
+          </p>
+          <Link href={`/profile/${profile.handle}`}>
+            <p className="cursor-pointer text-violet-600 text-lg font-medium text-center mt-2 mb-2">
+              {profile.handle}
+            </p>
+          </Link>
+          <p className="text-pink-600 text-sm font-medium text-center">
+            {profile.stats.totalFollowers} followers
+          </p>
+        </div>
+      ))}
 
       {loading ? (
         <div className="flex justify-center items-center mt-12  space-x-2">
@@ -285,6 +347,14 @@ const vote = ({ Web3Handler, account }) => {
                     vote!
                   </span>
                 </button>
+                {/* <LensShareButton
+                  postBody="Hello, Lens!"
+                  url="https://lens.xyz"
+                  via="lensprotocol"
+                  hashtags="react,js"
+                  preview={true}
+                />
+                <span id="lens-follow-small" data-handle="chrisabdo.lens" /> */}
               </div>
             </div>
           ))}

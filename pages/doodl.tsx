@@ -269,12 +269,12 @@ const Page: FC<pageProps> = ({}) => {
   return (
     <>
       <div className="flex items-center text-center justify-center">
-        <div className="card rounded-none w-96 bg-base-100 border border-black text-center items-center">
+        <div className="card rounded-none w-96 bg-base-100 border-[2px] border-black text-center items-center">
           <div className="card-body text-center  justify-center items-center">
             <h2 id="prompt" className="card-title font-extrabold">
               PROMPT:
             </h2>
-            <h2 className="card-title text-2xl">{prompt}</h2>
+            <h2 className="card-title text-3xl">{prompt}</h2>
 
             <br />
             <h2 className="card-title">TIME REMAINING:</h2>
@@ -371,7 +371,7 @@ const Page: FC<pageProps> = ({}) => {
               onMouseDown={onMouseDown}
               width={500}
               height={500}
-              className="border border-black rounded-none"
+              className="border-[2px] border-black rounded-none"
               id="canvas"
             />
           </div>
@@ -435,7 +435,7 @@ const Page: FC<pageProps> = ({}) => {
             <input
               type="file"
               name="Asset"
-              className="my-4"
+              className="file-input file-input-bordered file-input-info mt-2 w-full"
               onChange={onChange}
               required
             />

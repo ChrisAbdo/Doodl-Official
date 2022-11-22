@@ -25,7 +25,7 @@ const Navbar = ({ Web3Handler, account }) => {
           >
             <span className="absolute inset-0 w-full h-full transition duration-200 ease-out transform translate-x-1 translate-y-1 bg-[#FF6F91] border-black border-[2px] group-hover:-translate-x-0 group-hover:-translate-y-0"></span>
             <span className="absolute inset-0 w-full h-full bg-white border-2 border-black group-hover:bg-[#FF6F91]"></span>
-            <span className="relative text-black group-hover:text-black font-bold ">
+            <span className="relative text-black group-hover:text-black font-semibold ">
               {account
                 ? account.slice(0, 5) + "..." + account.slice(-4)
                 : "Connect Wallet"}
