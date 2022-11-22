@@ -49,6 +49,8 @@ const Page: FC<pageProps> = ({}) => {
   const [seconds, setSeconds] = useState(0);
 
   const [fileUrl, setFileUrl] = useState(null);
+  // const canvasUrl should be the canvas downloaded
+  const [canvasUrl, setCanvasUrl] = useState(null);
   const [file, setFile] = useState(null);
   const [formInput, updateFormInput] = useState({
     price: "",
@@ -128,8 +130,25 @@ const Page: FC<pageProps> = ({}) => {
   }
 
   async function onChange(e) {
-    // upload image to IPFS
-    const file = e.target.files[0];
+    // // upload image to IPFS,
+    // // const file should be the canvas
+    // const file = canvasRef.current.toDataURL();
+
+    // try {
+    //   const added = await client.add(file, {
+    //     progress: (prog) => console.log(`received: ${prog}`),
+    //   });
+    //   const url = `${IPFSGateway}${added.path}`;
+    //   setFileUrl(url);
+    // } catch (error) {
+    //   console.log("Error uploading file: ", error);
+    // }
+
+    // upload the canvas to IPFS id="canvas"
+    const canvas = document.getElementById("canvas");
+    const image = canvas.toDataURL("image/png");
+    const blob = await fetch(image).then((r) => r.blob());
+    const file = new File([blob], "image.png", { type: "image/png" });
 
     try {
       const added = await client.add(file, {
@@ -137,12 +156,34 @@ const Page: FC<pageProps> = ({}) => {
       });
       const url = `${IPFSGateway}${added.path}`;
       setFileUrl(url);
+      console.log("url", url);
     } catch (error) {
       console.log("Error uploading file: ", error);
     }
   }
 
   async function uploadToIPFS() {
+    // const { name, description, price } = formInput;
+    // if (!name || !description || !price || !fileUrl) {
+    //   return;
+    // } else {
+    //   // first, upload metadata to IPFS
+    //   const data = JSON.stringify({
+    //     name,
+    //     description,
+    //     image: fileUrl,
+    //   });
+    //   try {
+    //     const added = await client.add(data);
+    //     const url = `https://ipfs.io/ipfs/${added.path}`;
+    //     // after metadata is uploaded to IPFS, return the URL to use it in the transaction
+    //     return url;
+    //   } catch (error) {
+    //     console.log("Error uploading file: ", error);
+    //   }
+    // }
+
+    // should upload the canvas to IPFS
     const { name, description, price } = formInput;
     if (!name || !description || !price || !fileUrl) {
       return;
@@ -250,25 +291,25 @@ const Page: FC<pageProps> = ({}) => {
     }
   }
 
-  const downloadCanvas = () => {
-    const canvas = document.getElementById("canvas");
-    const image = canvas
-      .toDataURL("image/png", 1.0)
-      .replace("image/png", "image/octet-stream");
-    const link = document.createElement("a");
-    link.download = "my-image.png";
-    link.href = image;
-    link.click();
-    toast.success("Canvas downloaded!", {
-      style: {
-        border: "2px solid #000",
-      },
-    });
-  };
+  // const downloadCanvas = () => {
+  //   const canvas = document.getElementById("canvas");
+  //   const image = canvas
+  //     .toDataURL("image/png", 1.0)
+  //     .replace("image/png", "image/octet-stream");
+  //   const link = document.createElement("a");
+  //   link.download = "my-image.png";
+  //   link.href = image;
+  //   link.click();
+  //   toast.success("Canvas downloaded!", {
+  //     style: {
+  //       border: "2px solid #000",
+  //     },
+  //   });
+  // };
 
   return (
     <>
-      <div className="alert alert-info shadow-lg mb-8">
+      <div className="alert alert-info shadow-lg mb-8 rounded-none">
         <div>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -371,6 +412,7 @@ const Page: FC<pageProps> = ({}) => {
               {minutes > 0 || hours > 0 ? (
                 <label
                   htmlFor="my-modal-6"
+                  onClick={onChange}
                   className="relative inline-block px-4 py-2 font-medium group cursor-pointer text-center"
                 >
                   <span className="absolute inset-0 w-full h-full transition duration-200 ease-out transform translate-x-1 translate-y-1 bg-[#77dd77] border-black border-[2px] group-hover:-translate-x-0 group-hover:-translate-y-0"></span>
@@ -440,15 +482,12 @@ const Page: FC<pageProps> = ({}) => {
                 updateFormInput({ ...formInput, price: e.target.value })
               }
             />
-            <label htmlFor="price">
-              For safety purposes, please manually import your doodl <br />
-              1. Click the "download" button below, this will automatically
-              download your doodl as a png file <br />
-              2. Choose the file you just downloaded <br />
-              3. Click "submit" <br />
-              4. Wait for the voting period!
+            <label className="text-center" htmlFor="price">
+              <span className="text-red-500">Warning!</span> Sometimes the
+              drawing takes a second to upload. If you get an error, please try
+              again in a few seconds!
             </label>
-            <div
+            {/* <div
               onClick={downloadCanvas}
               className="relative inline-block px-4 py-2 font-medium group cursor-pointer text-center"
             >
@@ -457,17 +496,26 @@ const Page: FC<pageProps> = ({}) => {
               <span className="relative text-black group-hover:text-black">
                 download doodl
               </span>
-            </div>
-            <input
+            </div> */}
+            {/* <input
               type="file"
               name="Asset"
               className="file-input file-input-bordered file-input-info mt-2 w-full"
               onChange={onChange}
               required
-            />
+            /> */}
             <label className="text-center" htmlFor="price">
               BE ALERT: ALL DOODLS WILL BE VERIFIED.
             </label>
+
+            {/* input button with onchange, this should not take in the file but should rather be imported */}
+            {/* <input
+              type="file"
+              name="Asset"
+              className="file-input file-input-bordered file-input-info mt-2 w-full"
+              onChange={onChange}
+              required
+            /> */}
 
             <div
               onClick={listNFTForSale}
